@@ -54,6 +54,28 @@ A comprehensive machine learning-powered dashboard for airport ground operations
 4. **Access the dashboard**
    Open your browser and navigate to: `http://127.0.0.1:5000`
 
+## 🚀 Deployment on Render
+
+### Option 1: Using Render Dashboard (Recommended)
+1. **Connect your GitHub repository** to Render
+2. **Create a new Web Service** from your Render dashboard
+3. **Configure the service**:
+   - **Runtime**: Python 3
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `gunicorn app:app --bind 0.0.0.0:$PORT`
+4. **Add Environment Variables** (if needed):
+   - `PYTHON_VERSION`: `3.11.0`
+5. **Deploy**: Click "Create Web Service"
+
+### Option 2: Using render.yaml
+1. **Push the `render.yaml` file** to your repository
+2. **Connect repository** to Render
+3. **Render will automatically detect** the configuration
+4. **Deploy** the service
+
+### Environment Variables
+Create a `.env` file for local development and add any sensitive variables to Render's environment settings.
+
 ## Usage
 
 ### Upload Flight Data
