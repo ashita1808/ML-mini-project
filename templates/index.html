@@ -31,20 +31,67 @@
         <div class="alert alert-danger">{{ error }}</div>
     {% endif %}
 
+    {% if not kpis %}
+        <!-- Hero Section for Initial State -->
+        <div class="hero-section mb-5">
+            <div class="text-center py-5">
+                <div class="hero-icon mb-4">
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L13.09 8.26L19 9L13.09 9.74L12 16L10.91 9.74L5 9L10.91 8.26L12 2Z" fill="#4f46e5"/>
+                        <path d="M21 16V14L19 12L21 10V8L23 10L21 12L23 14V16L21 14L19 16L21 16Z" fill="#22d3ee"/>
+                        <path d="M3 16V14L5 12L3 10V8L1 10L3 12L1 14V16L3 14L5 16L3 16Z" fill="#22d3ee"/>
+                    </svg>
+                </div>
+                <h3 class="hero-title mb-3">Welcome to Airport Ground Operations Optimizer</h3>
+                <p class="hero-subtitle mb-4">Upload your flight schedule CSV to get instant insights on delays, staffing needs, and operational efficiency.</p>
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon">📊</div>
+                        <h6>Delay Prediction</h6>
+                        <p>AI-powered predictions for flight delays</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">👥</div>
+                        <h6>Crew Optimization</h6>
+                        <p>Smart staffing recommendations</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">🌤️</div>
+                        <h6>Weather Integration</h6>
+                        <p>Real-time weather impact analysis</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">📈</div>
+                        <h6>Performance Metrics</h6>
+                        <p>Comprehensive operational KPIs</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
     <div class="card dashboard-card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">🚀 Start Optimization</h5>
+        </div>
         <div class="card-body">
             <form method="POST" enctype="multipart/form-data" class="row gy-3 gx-4">
                 <div class="col-lg-5 col-sm-12">
-                    <label class="form-label">Upload flight CSV</label>
-                    <input type="file" name="file" class="form-control" required>
+                    <label class="form-label fw-semibold">📁 Upload Flight Schedule CSV</label>
+                    <input type="file" name="file" class="form-control form-control-lg" required>
                     <div class="form-text">Required columns: Month, DayOfWeek, CRSDepTime, CRSArrTime, Distance.</div>
                 </div>
                 <div class="col-lg-4 col-sm-12">
-                    <label class="form-label">Weather location</label>
-                    <input type="text" name="weather_location" class="form-control" placeholder="City (e.g. Delhi)" value="{{ request.form.weather_location or 'New York' }}">
+                    <label class="form-label fw-semibold">🌍 Weather Location</label>
+                    <input type="text" name="weather_location" class="form-control form-control-lg" placeholder="City (e.g. Delhi)" value="{{ request.form.weather_location or 'New York' }}">
+                    <div class="form-text">Enter city for weather impact analysis.</div>
                 </div>
                 <div class="col-lg-3 col-sm-12 d-flex align-items-end">
-                    <button class="btn btn-primary btn-lg w-100">Run Optimization</button>
+                    <button class="btn btn-primary btn-lg w-100 fw-semibold">
+                        <span class="d-flex align-items-center justify-content-center gap-2">
+                            ⚡ Run Optimization
+                        </span>
+                    </button>
                 </div>
             </form>
         </div>
