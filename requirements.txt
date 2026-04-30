@@ -2,3 +2,8 @@ pandas
 numpy
 seaborn
 matplotlib
+Flask
+requests
+scikit-learn
+plotly
+joblib

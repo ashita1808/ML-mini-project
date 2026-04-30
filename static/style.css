@@ -1,0 +1,216 @@
+body {
+    background: linear-gradient(135deg, #1d2b64 0%, #f8cdda 100%);
+    min-height: 100vh;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #212529;
+}
+
+.app-shell {
+    min-height: 100vh;
+}
+
+.navbar {
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.page-header {
+    color: #fff;
+    padding: 2rem 1.5rem;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 25px 60px rgba(15, 23, 42, 0.15);
+}
+
+.page-header h1,
+.page-header p {
+    color: #fff;
+}
+
+.dashboard-card,
+.weather-card,
+.chart-card,
+.metric-card,
+.table-card,
+.insight-card {
+    border-radius: 24px;
+    box-shadow: 0 25px 45px rgba(15, 23, 42, 0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.92);
+}
+
+.dashboard-card form .form-label {
+    margin-bottom: 0.5rem;
+}
+
+.dashboard-card form .form-control {
+    min-height: 3.2rem;
+}
+
+.dashboard-card form .form-text {
+    margin-top: 0.35rem;
+}
+
+.dashboard-card .form-control,
+.dashboard-card .form-label,
+.dashboard-card .btn {
+    border-radius: 16px;
+}
+
+.weather-card .card-title,
+.chart-card .card-title,
+.table-card .card-title,
+.insight-card .card-title {
+    font-weight: 700;
+}
+
+.metric-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 30px 60px rgba(15, 23, 42, 0.12);
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #4f46e5, #22d3ee);
+}
+
+.bg-gradient-warning {
+    background: linear-gradient(135deg, #f59e0b, #fb7185);
+}
+
+.bg-gradient-danger {
+    background: linear-gradient(135deg, #dc2626, #fb7185);
+}
+
+.bg-gradient-primary,
+.bg-gradient-warning,
+.bg-gradient-danger {
+    color: #fff;
+}
+
+.table-card {
+    overflow: hidden;
+}
+
+.table-card table {
+    margin-bottom: 0;
+}
+
+.table-card thead th {
+    background: #eef2ff;
+    color: #334155;
+    border-bottom: none;
+}
+
+.table-card tbody tr:hover {
+    background: rgba(99, 102, 241, 0.08);
+}
+
+.chart-container {
+    max-width: 100%;
+    min-height: 320px;
+}
+
+.insight-card {
+    border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.insight-icon {
+    width: 54px;
+    height: 54px;
+    font-size: 1.25rem;
+}
+
+input.form-control,
+.form-control:focus {
+    box-shadow: none;
+    border: 1px solid rgba(99, 102, 241, 0.4);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #4f46e5, #22d3ee);
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #4338ca, #0ea5e9);
+}
+
+.alert {
+    border-radius: 18px;
+}
+
+@media (max-width: 991px) {
+    .page-header {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        padding-bottom: 2rem;
+    }
+
+    .page-header,
+    .dashboard-card,
+    .weather-card,
+    .chart-card,
+    .table-card,
+    .insight-card {
+        border-radius: 20px;
+    }
+}
+
+/* subtle fade-in */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.dashboard-card,
+.weather-card,
+.chart-card,
+.metric-card,
+.table-card,
+.insight-card {
+    animation: fadeIn 0.5s ease-out;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.08);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(79, 70, 229, 0.7);
+    border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(59, 130, 246, 0.8);
+}
+
+.status-badge {
+    padding: 0.45em 0.7em;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.status-badge.shortage {
+    background: #dc3545;
+}
+
+.status-badge.optimal {
+    background: #198754;
+}
+
+.status-badge.overstaffed {
+    background: #f59e0b;
+}

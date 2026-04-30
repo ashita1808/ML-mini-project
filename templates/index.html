@@ -1,1 +1,241 @@
-<h1>Welcome to the home page</h1>
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airport Ground Operations Optimizer</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="app-shell">
+
+<div class="container py-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3 mb-4 page-header">
+        <div>
+            <h2 class="mb-2">✈ Airport Ground Operations Optimizer</h2>
+            <p class="mb-0 text-muted">Upload schedules, predict delays, optimize crew staffing, and visualize weather risk.</p>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="https://github.com/" target="_blank" class="btn btn-outline-light">Documentation</a>
+            <a href="{{ url_for('export_predictions') }}" class="btn btn-primary">Export CSV</a>
+        </div>
+    </div>
+
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+
+    <div class="card dashboard-card mb-4">
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data" class="row gy-3 gx-4">
+                <div class="col-lg-5 col-sm-12">
+                    <label class="form-label">Upload flight CSV</label>
+                    <input type="file" name="file" class="form-control" required>
+                    <div class="form-text">Required columns: Month, DayOfWeek, CRSDepTime, CRSArrTime, Distance.</div>
+                </div>
+                <div class="col-lg-4 col-sm-12">
+                    <label class="form-label">Weather location</label>
+                    <input type="text" name="weather_location" class="form-control" placeholder="City (e.g. Delhi)" value="{{ request.form.weather_location or 'New York' }}">
+                </div>
+                <div class="col-lg-3 col-sm-12 d-flex align-items-end">
+                    <button class="btn btn-primary btn-lg w-100">Run Optimization</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if kpis %}
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="card metric-card h-100 text-center py-4">
+                    <div class="card-body">
+                        <h6 class="text-uppercase text-muted">Total Flights</h6>
+                        <h2>{{ kpis.total_flights }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card metric-card h-100 text-center py-4">
+                    <div class="card-body">
+                        <h6 class="text-uppercase text-muted">Delay Rate</h6>
+                        <h2>{{ kpis.delay_rate }}%</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card metric-card h-100 text-center py-4">
+                    <div class="card-body">
+                        <h6 class="text-uppercase text-muted">High Risk Flights</h6>
+                        <h2>{{ kpis.high_risk_flights }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-xl-4">
+                <div class="card weather-card h-100 p-4">
+                    <h5 class="card-title mb-3">Operational Weather</h5>
+                    {% if weather %}
+                        <p class="mb-1 text-primary fw-semibold">{{ weather.location }}</p>
+                        <p class="mb-2">{{ weather.description }}{% if weather.temperature is not none %}, {{ weather.temperature }}°C{% endif %}</p>
+                        {% if weather.humidity is not none %}
+                            <p class="text-muted mb-3">Humidity: {{ weather.humidity }}%</p>
+                        {% endif %}
+                        <div class="d-flex flex-wrap gap-2">
+                            <span class="badge bg-info">Impact {{ (weather.impact * 100)|round(0) }}%</span>
+                            <span class="badge bg-secondary">Source: {{ weather.source }}</span>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Weather data appears after upload.</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-xl-8">
+                <div class="card chart-card h-100 p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h5 class="card-title mb-1">Delay Distribution</h5>
+                            <p class="text-muted mb-0">On-time vs delayed flight predictions.</p>
+                        </div>
+                    </div>
+                    <div class="chart-container mt-3">
+                        <canvas id="chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-lg-7">
+                <div class="card table-card h-100 p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">Predicted Flights</h5>
+                        <span class="badge bg-primary">Preview</span>
+                    </div>
+                    <div class="table-responsive">{{ table|safe }}</div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="card table-card h-100 p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">Crew Staffing Plan</h5>
+                        <span class="badge bg-secondary">Hourly</span>
+                    </div>
+                    {% if staff_data %}
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Hour</th>
+                                        <th>Shift</th>
+                                        <th>Flights</th>
+                                        <th>Required</th>
+                                        <th>Available</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in staff_data %}
+                                        <tr>
+                                            <td>{{ '%02d:00'|format(row.hour) }}</td>
+                                            <td>{{ row.shift }}</td>
+                                            <td>{{ row.flights }}</td>
+                                            <td>{{ row.required }}</td>
+                                            <td>{{ row.available }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">Upload a schedule to view staffing recommendations.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-12">
+                <div class="card table-card h-100 p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">Gate Assignments</h5>
+                        <span class="badge bg-secondary">Status</span>
+                    </div>
+                    {% if gate_data %}
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Gate</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in gate_data %}
+                                        <tr>
+                                            <td>{{ row.Gate }}</td>
+                                            <td>{{ row.GateStatus }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">Gate assignment details appear after upload.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="card insight-card mb-4 p-4">
+            <h5 class="card-title mb-3">Optimization Insights</h5>
+            {% if insights %}
+                <div class="row g-3">
+                    {% for item in insights %}
+                        <div class="col-sm-6">
+                            <div class="alert alert-{{ 'success' if item.type == 'success' else 'warning' if item.type == 'warning' else 'danger' if item.type == 'danger' else 'info' }} mb-0">
+                                {{ item.message }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted mb-0">Run a CSV upload to generate insights for staffing and delay reduction.</p>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+
+<!-- Chart Script -->
+<script>
+    const labels = {{ charts['labels'] | tojson if charts else [] }};
+    const values = {{ charts['values'] | tojson if charts else [] }};
+
+    if (labels.length > 0) {
+        new Chart(document.getElementById("chart"), {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: ['#198754', '#dc3545'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
